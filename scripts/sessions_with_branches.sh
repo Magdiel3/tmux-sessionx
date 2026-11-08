@@ -55,11 +55,19 @@ else
 	# Progressive mode: resolve branches one by one, reload after each
 	declare -a session_list=()
 	declare -a ref_list=()
+	declare -a icon_list=()
 	while IFS= read -r session; do
 		[[ -z "$session" ]] && continue
 		session_list+=("$session")
 		ref_list+=("")
+		icon_list+=("$GIT_BRANCH_ICON")
 	done <<< "$sorted"
+
+	max_len=0
+	for name in "${session_list[@]}"; do
+		len=${#name}
+		(( len > max_len )) && max_len=$len
+	done
 
 	TMPBASE="/tmp/sessionx-branches-$$"
 
@@ -68,8 +76,9 @@ else
 		for ((j=0; j<${#session_list[@]}; j++)); do
 			name="${session_list[$j]}"
 			ref="${ref_list[$j]}"
+			icon="${icon_list[$j]}"
 			if [[ -n "$ref" ]]; then
-				printf '%s %s(%s)%s\n' "$name" "$GIT_BRANCH_COLOR" "$ref" "$GIT_BRANCH_RESET"
+				printf "%-${max_len}s  ${GIT_BRANCH_COLOR}${icon} %s${GIT_BRANCH_RESET}\n" "$name" "$ref"
 			else
 				printf "%s\n" "$name"
 			fi
@@ -80,8 +89,21 @@ else
 
 	for ((i=0; i<${#session_list[@]}; i++)); do
 		session="${session_list[$i]}"
-		ref=$(session_git_branch "$session")
+		pane_path=$(tmux list-panes -t "$session" -F '#{pane_current_path}' 2>/dev/null | head -1)
+		ref=""
+		icon="$GIT_BRANCH_ICON"
+		if [[ -n "$pane_path" ]]; then
+			ref=$(git -C "$pane_path" branch --show-current 2>/dev/null)
+			if [[ -n "$ref" ]]; then
+				ref=$(abbreviate_git_branch "$pane_path" "$ref")
+			fi
+			if [[ -z "$ref" ]]; then
+				ref=$(git -C "$pane_path" describe --tags --exact-match 2>/dev/null)
+				[[ -n "$ref" ]] && icon="$GIT_TAG_ICON"
+			fi
+		fi
 		ref_list[$i]="$ref"
+		icon_list[$i]="$icon"
 
 		if [[ -n "$ref" ]]; then
 			tmpfile="${TMPBASE}-${i}"
