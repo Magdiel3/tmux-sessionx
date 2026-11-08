@@ -4,11 +4,17 @@ GIT_BRANCH_COLOR=$'\033[38;2;137;180;250m'
 GIT_BRANCH_RESET=$'\033[0m'
 
 session_git_branch() {
-	local pane_path branch
+	local pane_path branch remote default_ref
 	while IFS= read -r pane_path; do
 		[[ -z "$pane_path" ]] && continue
-		branch=$(git -C "$pane_path" branch --show-current 2>/dev/null)
+		branch=$(git -C "$pane_path" branch --show-current 2>/dev/null) || branch=""
 		if [[ -n "$branch" ]]; then
+			remote=$(git -C "$pane_path" config --get "branch.$branch.remote" 2>/dev/null) || remote=""
+			[[ -z "$remote" || "$remote" == "." ]] && remote=origin
+			default_ref=$(git -C "$pane_path" symbolic-ref --quiet "refs/remotes/$remote/HEAD" 2>/dev/null) || default_ref=""
+			if [[ "$default_ref" == "refs/remotes/$remote/$branch" ]]; then
+				branch=m
+			fi
 			printf '%s\n' "$branch"
 			return
 		fi

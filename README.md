@@ -208,6 +208,7 @@ set -g @sessionx-fzf-marks-mode 'off'
 set -g @sessionx-filtered-sessions 'scratch,somesession'
 
 # Display the first git branch found in a session's "main" window.
+# A branch matching the locally recorded remote default is shown as "m".
 # Branches are loaded asynchronously so session list appears instantly.
 # Requires git. (default: off)
 set -g @sessionx-git-branch 'on'
