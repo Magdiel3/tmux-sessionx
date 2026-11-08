@@ -5,14 +5,12 @@ GIT_BRANCH_RESET=$'\033[0m'
 GIT_BRANCH_ICON=""
 GIT_TAG_ICON=""
 
-abbreviate_git_branch() {
+display_git_branch() {
 	local path="$1" branch="$2" remote default_ref
 	remote=$(git -C "$path" config --get "branch.$branch.remote" 2>/dev/null) || remote=""
 	[[ -z "$remote" || "$remote" == "." ]] && remote=origin
 	default_ref=$(git -C "$path" symbolic-ref --quiet "refs/remotes/$remote/HEAD" 2>/dev/null) || default_ref=""
-	if [[ "$default_ref" == "refs/remotes/$remote/$branch" ]]; then
-		printf '%s\n' m
-	else
+	if [[ "$default_ref" != "refs/remotes/$remote/$branch" ]]; then
 		printf '%s\n' "$branch"
 	fi
 }
@@ -34,9 +32,8 @@ format_sessions_with_git_branch() {
 		if [[ -n "$pane_path" ]]; then
 			ref=$(git -C "$pane_path" branch --show-current 2>/dev/null)
 			if [[ -n "$ref" ]]; then
-				ref=$(abbreviate_git_branch "$pane_path" "$ref")
-			fi
-			if [[ -z "$ref" ]]; then
+				ref=$(display_git_branch "$pane_path" "$ref")
+			else
 				ref=$(git -C "$pane_path" describe --tags --exact-match 2>/dev/null)
 				[[ -n "$ref" ]] && icon="$GIT_TAG_ICON"
 			fi

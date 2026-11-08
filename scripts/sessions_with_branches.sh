@@ -95,9 +95,8 @@ else
 		if [[ -n "$pane_path" ]]; then
 			ref=$(git -C "$pane_path" branch --show-current 2>/dev/null)
 			if [[ -n "$ref" ]]; then
-				ref=$(abbreviate_git_branch "$pane_path" "$ref")
-			fi
-			if [[ -z "$ref" ]]; then
+				ref=$(display_git_branch "$pane_path" "$ref")
+			else
 				ref=$(git -C "$pane_path" describe --tags --exact-match 2>/dev/null)
 				[[ -n "$ref" ]] && icon="$GIT_TAG_ICON"
 			fi

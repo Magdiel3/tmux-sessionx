@@ -17,18 +17,18 @@ REMOTE=origin
 EXPECTED_REMOTE=origin
 for branch in main master jp6; do
 	DEFAULT_REF="refs/remotes/origin/$branch"
-	[[ "$(abbreviate_git_branch /repo "$branch")" == m ]]
+	[[ -z "$(display_git_branch /repo "$branch")" ]]
 done
 
 DEFAULT_REF=refs/remotes/origin/main
-[[ "$(abbreviate_git_branch /repo feature/test)" == feature/test ]]
+[[ "$(display_git_branch /repo feature/test)" == feature/test ]]
 DEFAULT_REF=
-[[ "$(abbreviate_git_branch /repo jp6)" == jp6 ]]
+[[ "$(display_git_branch /repo jp6)" == jp6 ]]
 REMOTE=upstream
 EXPECTED_REMOTE=upstream
 DEFAULT_REF=refs/remotes/upstream/jp6
-[[ "$(abbreviate_git_branch /repo jp6)" == m ]]
+[[ -z "$(display_git_branch /repo jp6)" ]]
 REMOTE=.
 EXPECTED_REMOTE=origin
 DEFAULT_REF=refs/remotes/origin/jp6
-[[ "$(abbreviate_git_branch /repo jp6)" == m ]]
+[[ -z "$(display_git_branch /repo jp6)" ]]
