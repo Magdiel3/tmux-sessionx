@@ -207,7 +207,7 @@ set -g @sessionx-fzf-marks-mode 'off'
 # and 'somesession'
 set -g @sessionx-filtered-sessions 'scratch,somesession'
 
-# Display the current git branch next to each session name.
+# Display the first git branch found in a session's "main" window.
 # Branches are loaded asynchronously so session list appears instantly.
 # Requires git. (default: off)
 set -g @sessionx-git-branch 'on'
